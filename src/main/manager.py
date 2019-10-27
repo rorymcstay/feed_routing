@@ -23,6 +23,8 @@ class RoutingManager(object):
                                                                                              name=name)
             ).json()})
 
+    logging.info("loaded parameters for: "+str(names))
+
     def getResultPageUrl(self, name, make=None, model=None, page=None, sort="newest"):
         if page is not None:
             page = self.home_config[name]["page"]["increment"] * page
@@ -33,7 +35,7 @@ class RoutingManager(object):
             if "MODEL" in substring.upper() and model is None:
                 continue
             if "PAGE" in substring.upper() and page is None:
-                continue
+                page = 1
             url = url + substring
         if self.home_config[name].get("sort_first"):
             sort = self.home_config[name].get("sort_first")[sort]

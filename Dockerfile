@@ -4,16 +4,15 @@ RUN mkdir -p /home
 
 WORKDIR /home
 
-# Copying over necessary files
-COPY src ./src
-
-COPY requirements.txt ./requirements.txt
-COPY settings.py ./settings.py
-COPY routing.py ./app.py
-
+ADD requirements.txt ./requirements.txt
 RUN python -m pip install pip
 # Installing packages
 RUN pip install -r ./requirements.txt
+
+# Copying over necessary files
+COPY settings.py ./settings.py
+COPY routing.py ./app.py
+COPY src ./src
 
 # Entrypoint
 CMD ["python", "./app.py" ]
