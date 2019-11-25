@@ -2,3 +2,4 @@ hazelcast-python-client
 flask
 flask-classy
 requests
+feed_utils

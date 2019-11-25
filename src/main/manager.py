@@ -7,23 +7,25 @@ import time
 from hazelcast import HazelcastClient, ClientConfig
 from hazelcast.proxy import List
 
-from settings import hazelcast_params, nanny_params
+from feed.settings import hazelcast_params, nanny_params
 
 
 class RoutingManager(object):
     config = ClientConfig()
     config.network_config.addresses.append("{host}:{port}".format(**hazelcast_params))
     hz = HazelcastClient(config)
-    names = requests.get("http://{host}:{port}/parametercontroller/getFeeds/".format(**nanny_params)).json()
-    home_config = {}
-    for name in names:
-        home_config.update({
-            name: requests.get(
-                "http://{host}:{port}/parametercontroller/getParameter/router/{name}".format(**nanny_params,
-                                                                                             name=name)
-            ).json()})
 
-    logging.info("loaded parameters for: "+str(names))
+    def __init__(self):
+        self.names = requests.get("http://{host}:{port}/parametercontroller/getFeeds/".format(**nanny_params)).json()
+        self.home_config = {}
+        for name in self.names:
+            self.home_config.update({
+                name: requests.get(
+                    "http://{host}:{port}/parametercontroller/getParameter/router/{name}".format(**nanny_params,
+                                                                                                 name=name)
+                ).json()})
+
+        logging.info("loaded parameters for: "+str(self.names))
 
     def getResultPageUrl(self, name, make=None, model=None, page=None, sort="newest"):
         if page is not None:

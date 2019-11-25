@@ -3,7 +3,7 @@ from flask import jsonify
 from flask import request
 from flask_classy import FlaskView, route
 
-from settings import nanny_params
+from feed.settings import nanny_params
 from src.main.manager import RoutingManager
 
 
