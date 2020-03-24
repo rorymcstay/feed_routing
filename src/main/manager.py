@@ -1,4 +1,3 @@
-import logging
 import os
 
 import requests
@@ -7,6 +6,7 @@ import time
 from hazelcast import HazelcastClient, ClientConfig
 from hazelcast.proxy import List
 
+from feed.logger import logger as logging
 from feed.settings import hazelcast_params, nanny_params
 
 
