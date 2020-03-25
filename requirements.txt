@@ -2,4 +2,4 @@ hazelcast-python-client
 flask
 flask-classy
 requests
-feed_utils==0.1.6
+feed_utils==0.1.9
