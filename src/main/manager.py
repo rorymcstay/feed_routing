@@ -5,6 +5,7 @@ import time
 
 from hazelcast import HazelcastClient, ClientConfig
 from hazelcast.proxy import List
+from json.decoder import JSONDecodeError
 
 from feed.logger import logger as logging
 from feed.settings import hazelcast_params, nanny_params
@@ -16,14 +17,23 @@ class RoutingManager(object):
     hz = HazelcastClient(config)
 
     def __init__(self):
-        self.names = requests.get("http://{host}:{port}/parametercontroller/getFeeds/".format(**nanny_params)).json()
+        try:
+            self.names = requests.get("http://{host}:{port}/parametercontroller/getFeeds/".format(**nanny_params)).json()
+        except JSONDecodeError as ex:
+            logging.error(f'couldnt get feed names ')
+            self.names = []
         self.home_config = {}
         for name in self.names:
-            self.home_config.update({
-                name: requests.get(
-                    "http://{host}:{port}/parametercontroller/getParameter/router/{name}".format(**nanny_params,
-                                                                                                 name=name)
-                ).json()})
+            try:
+                self.home_config.update({
+                    name: requests.get(
+                        "http://{host}:{port}/parametercontroller/getParameter/router/{name}".format(**nanny_params,
+                                                                                                     name=name)
+                    ).json()})
+            except JSONDecodeError as ex:
+                logging.warning(f'no routing params for {name}')
+                continue
+
 
         logging.info("loaded parameters for: "+str(self.names))
 
