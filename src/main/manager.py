@@ -3,18 +3,35 @@ import os
 import requests
 import time
 
-from hazelcast import HazelcastClient, ClientConfig
-from hazelcast.proxy import List
 from json.decoder import JSONDecodeError
 
 from feed.logger import logger as logging
 from feed.settings import hazelcast_params, nanny_params
 
+class List:
+    def __init__(self):
+        self.data = []
+
+    def add(self, item):
+        self.data.append(item)
+    def size(self):
+        return len(self.data)
+    def get(ind):
+        if ind >= self.size():
+            return self.data[-1]
+        return self.data[ind]
+    def clear():
+        self.data = []
+
+class History():
+    lists = {}
+    def get_list(name):
+        if self.lists.get(name) is None:
+            self.lists.update(name=List())
+        return lists.get(name)
 
 class RoutingManager(object):
-    config = ClientConfig()
-    config.network_config.addresses.append("{host}:{port}".format(**hazelcast_params))
-    hz = HazelcastClient(config)
+    hz = History()
 
     def __init__(self):
         try:
@@ -34,8 +51,7 @@ class RoutingManager(object):
                 logging.warning(f'no routing params for {name}')
                 continue
 
-
-        logging.info("loaded parameters for: "+str(self.names))
+        logging.info(f'loaded parameters for: {self.names}')
 
     def getResultPageUrl(self, name, make=None, model=None, page=None, sort="newest"):
         if page is not None:
@@ -71,11 +87,11 @@ class RoutingManager(object):
     def getLastPage(self, name):
         histName = "{}-history-{}".format(name, time.strftime("%d_%m"))
         history: List = self.hz.get_list(histName)
-        num = history.size().result()
+        num = history.size()
         if num < 1:
             return False
-        size = history.size().result()
-        last = history.get(size - 1).result()
+        size = history.size()
+        last = history.get(size - 1)
         url = str(last, "utf-8")
         payload = {"url": url,
                    "increment": self.home_config.get(name).get("page").get("increment")}
