@@ -16,7 +16,7 @@ class List:
         self.data.append(item)
     def size(self):
         return len(self.data)
-    def get(ind):
+    def get(self, ind):
         if ind >= self.size():
             return self.data[-1]
         return self.data[ind]
@@ -25,10 +25,10 @@ class List:
 
 class History():
     lists = {}
-    def get_list(name):
+    def get_list(self, name):
         if self.lists.get(name) is None:
-            self.lists.update(name=List())
-        return lists.get(name)
+            self.lists.update({name: List()})
+        return self.lists.get(name)
 
 class RoutingManager(object):
     hz = History()
