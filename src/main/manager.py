@@ -5,8 +5,10 @@ import time
 
 from json.decoder import JSONDecodeError
 
-from feed.logger import logger as logging
-from feed.settings import hazelcast_params, nanny_params
+from feed.logger import getLogger 
+from feed.settings import nanny_params
+
+logging = getLogger(__name__)
 
 class List:
     def __init__(self):
@@ -82,6 +84,7 @@ class RoutingManager(object):
             return "added one item to the cache"
 
         else:
+            logging.warning("did not update history for name={}, url={}".format(name, value))
             return "no"
 
     def getLastPage(self, name):
@@ -103,7 +106,7 @@ class RoutingManager(object):
         history.clear()
 
     def verifyItem(self, item, name):
-        if self.home_config.get(name).get("skeleton")[0] in str(item):
+        if self.home_config.get(name).get("skeleton")[0].strip('/') in str(item):
             return True
         else:
             return False
