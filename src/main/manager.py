@@ -5,37 +5,65 @@ import time
 
 from json.decoder import JSONDecodeError
 
-from feed.logger import getLogger 
+from feed.logger import getLogger
 from feed.settings import nanny_params
 
 logging = getLogger(__name__)
 
 class List:
-    def __init__(self):
+    def __init__(self, increment, home):
         self.data = []
+        self.increment = increment
+        self.pagesProcessed = 1
+        self.data.append(home)
+
+    def updatePagesProcessed(self):
+        self.pagesProcessed += 1
 
     def add(self, item):
         self.data.append(item)
+
     def size(self):
         return len(self.data)
+
     def get(self, ind):
         if ind >= self.size():
             return self.data[-1]
         return self.data[ind]
-    def clear():
+
+    def clear(self):
         self.data = []
 
-class History():
+    def getLast(self):
+        try:
+            return self.data[-1]
+        except IndexError as ex:
+            return ''
+
+    def __dict__(self):
+        return dict(url=self.getLast(), increment=self.increment, pagesProcessed=self.pagesProcessed)
+
+class History:
     lists = {}
+    def __init__(self, manager):
+        self.pagesProcessed = 0
+        self.manager = manager
+
+    @staticmethod
+    def get_current_name(name):
+        return "{}-history-{}".format(name, time.strftime("%d_%m"))
+
     def get_list(self, name):
-        if self.lists.get(name) is None:
-            self.lists.update({name: List()})
+        if self.lists.get(History.get_current_name(name)) is None:
+            self.lists.update({name: List(increment=self.manager.home_config.get(name)['page']['increment'],
+                                          home=self.manager.getResultPageUrl(name))})
         return self.lists.get(name)
 
 class RoutingManager(object):
-    hz = History()
+
 
     def __init__(self):
+        self.hz = History(self)
         try:
             self.names = requests.get("http://{host}:{port}/parametercontroller/getFeeds/".format(**nanny_params)).json()
         except JSONDecodeError as ex:
@@ -76,11 +104,10 @@ class RoutingManager(object):
 
     def updateHistory(self, name, value):
         if self.verifyItem(value, name):
-            histName = "{}-history-{}".format(name, time.strftime("%d_%m"))
-            history: List = self.hz.get_list(histName)
+            history: List = self.hz.get_list(name)
             history.add(value)
-            logging.info("history updated for {}".format(histName))
-
+            history.updatePagesProcessed()
+            logging.info("history updated for {}".format(History.get_current_name(name)))
             return "added one item to the cache"
 
         else:
@@ -88,21 +115,11 @@ class RoutingManager(object):
             return "no"
 
     def getLastPage(self, name):
-        histName = "{}-history-{}".format(name, time.strftime("%d_%m"))
-        history: List = self.hz.get_list(histName)
-        num = history.size()
-        if num < 1:
-            return False
-        size = history.size()
-        last = history.get(size - 1)
-        url = str(last, "utf-8")
-        payload = {"url": url,
-                   "increment": self.home_config.get(name).get("page").get("increment")}
-        return payload
+        history: List = self.hz.get_list(name)
+        return history.__dict__()
 
     def clearHistory(self, name):
-        histName = "{}-history-{}".format(name, time.strftime("%d_%m"))
-        history: List = self.hz.get_list(histName)
+        history: List = self.hz.get_list(name)
         history.clear()
 
     def verifyItem(self, item, name):
