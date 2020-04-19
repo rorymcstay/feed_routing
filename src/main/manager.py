@@ -66,6 +66,7 @@ class RoutingManager(object):
         self.hz = History(self)
         try:
             self.names = requests.get("http://{host}:{port}/parametercontroller/getFeeds/".format(**nanny_params)).json()
+            logging.info(f'have feeds {self.names}')
         except JSONDecodeError as ex:
             logging.error(f'couldnt get feed names ')
             self.names = []
@@ -84,6 +85,9 @@ class RoutingManager(object):
         logging.info(f'loaded parameters for: {self.names}')
 
     def getResultPageUrl(self, name, make=None, model=None, page=None, sort="newest"):
+        if self.home_config.get(name) is None:
+            logging.info(f'{name} is not currently being managed')
+            return 'not found'
         if page is not None:
             page = self.home_config[name]["page"]["increment"] * page
         url = ""

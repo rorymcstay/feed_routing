@@ -17,6 +17,8 @@ class RoutingController(FlaskView):
         :return:
         """
         options = request.json
+        if options is None:
+            options = {}
         return self.routingManager.getResultPageUrl(name=name, **options)
 
     @route("updateHistory/<string:name>", methods=["PUT"])
@@ -38,8 +40,10 @@ class RoutingController(FlaskView):
         """
         lastPage = self.routingManager.getLastPage(name)
         if lastPage:
-            resp = jsonify(lastPage)
+            resp = jsonify(lastPage) # type: Response
             resp.status_code = 200
+            resp.mimetype = 'application/json'
+            resp.
             return resp
         else:
             return "none"
