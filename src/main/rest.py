@@ -43,7 +43,6 @@ class RoutingController(FlaskView):
             resp = jsonify(lastPage) # type: Response
             resp.status_code = 200
             resp.mimetype = 'application/json'
-            resp.
             return resp
         else:
             return "none"
@@ -52,4 +51,8 @@ class RoutingController(FlaskView):
     def clearHistory(self, name):
         self.routingManager.clearHistory(name)
         return "ok"
+
+    @route('initialiseChainHistory/<string:name>', methods=['PUT'])
+    def initialiseChainHistory(self, name):
+        return self.routingManager.initialiseChainHistory(name)
 
