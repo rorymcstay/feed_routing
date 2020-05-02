@@ -52,7 +52,3 @@ class RoutingController(FlaskView):
         self.routingManager.clearHistory(name)
         return "ok"
 
-    @route('initialiseChainHistory/<string:name>', methods=['PUT'])
-    def initialiseChainHistory(self, name):
-        return self.routingManager.initialiseChainHistory(name)
-
