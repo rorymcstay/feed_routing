@@ -50,7 +50,7 @@ class RoutingController(FlaskView):
         return Response('ok')
 
     def updateHistory(self, name):
-        value = request.data
+        value = str(request.data)
         if self._verifyItem(value, name):
             session.add(value)
             session.updatePagesProcessed()
@@ -79,7 +79,7 @@ class RoutingController(FlaskView):
         return Response('ok', status=200)
 
     def _verifyItem(self, item, name):
-        if not session.home_config or self.home_config.get("skeleton")[0].strip('/') in str(item):
+        if not session.home_config or session.home_config.get("skeleton")[0].strip('/') in str(item):
             return True
         else:
             return False

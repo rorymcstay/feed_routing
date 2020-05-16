@@ -7,9 +7,11 @@ class FeedHistory(dict, SessionMixin):
         self.name = kwargs.get('name')
         self.data = kwargs.get('data', [kwargs.get('home')])
         self.increment = kwargs.get('increment')
-        self.pagesProcessed = kwargs.get('pagesProcessed')
+        self.pagesProcessed = kwargs.get('pagesProcessed', 0)
 
     def updatePagesProcessed(self):
+        if self.pagesProcessed is None:
+            self.pagesProcessed = 0
         self.pagesProcessed += 1
         self.modified = True
 
@@ -32,7 +34,7 @@ class FeedHistory(dict, SessionMixin):
     def size(self):
         return len(self.data)
 
-    def get(self, ind):
+    def getHistoryItem(self, ind):
         if ind >= self.size():
             return self.data[-1]
         return self.data[ind]
@@ -49,9 +51,13 @@ class FeedHistory(dict, SessionMixin):
 
     @property
     def home_config(self):
-        hcReq = requests.get("http://{host}:{port}/parametercontroller/getParameter/router/{name}".format(**nanny_params, name=name))
-        if hcReq.status_code == 404:
-            return dict(page={'increment': 1}, skeleton=[], sort_first={'newest': '', 'oldest': '', 'high': '', 'low': ''})
+        fail = False
+        try:
+            hcReq = requests.get("http://{host}:{port}/parametercontroller/getParameter/router/{name}".format(**nanny_params, name=name))
+        except Exception as ex:
+            fail = True
+        if fail or hcReq.status_code == 404:
+            return dict(page={'increment': 1}, skeleton=[''], sort_first={'newest': '', 'oldest': '', 'high': '', 'low': ''})
         else:
             return hcReq.json()
 

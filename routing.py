@@ -24,4 +24,5 @@ Service.register(app)
 
 if __name__ == '__main__':
     print(app.url_map)
-    app.run(port=os.getenv("FLASK_PORT", 5002), host="0.0.0.0")
+    app.run(port=os.getenv("FLASK_PORT", os.getenv("ROUTING_PORT", 5003)), host=os.getenv('ROUTER_HOST'))
+
