@@ -23,6 +23,7 @@ Service.register(app)
 
 
 if __name__ == '__main__':
+    logging.info("\n".join([f'{key}={os.environ[key]}' for key in os.environ]))
     print(app.url_map)
     app.run(port=os.getenv("FLASK_PORT", os.getenv("ROUTING_PORT", 5003)), host=os.getenv('ROUTER_HOST'))
 
