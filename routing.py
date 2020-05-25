@@ -1,29 +1,36 @@
 import logging
+from logging.config import dictConfig
 import os
 
 from feed.settings import nanny_params
-from flask import Flask
 
-from src.main.manager import RoutingController
-from src.main.domain import FeedHistory
-from feed.service import Service, Client
-from feed.chainsessions import init_app
+from feed.service import Client
 
-logging.basicConfig(level=os.environ.get("LOGLEVEL", "INFO"))
-logging.FileHandler('/var/tmp/myapp.log')
 
 nanny = Client("nanny", **nanny_params)
 
 
 
-app = init_app(FeedHistory)
-
-RoutingController.register(app)
-Service.register(app)
 
 
 if __name__ == '__main__':
+    dictConfig({
+        'version': 1,
+        'formatters': {'default': {
+            'format': '[%(asctime)s]%(thread)d: %(module)s - %(levelname)s - %(message)s',
+        }},
+        'handlers': {'wsgi': {
+            'class': 'logging.StreamHandler',
+            'stream': 'ext://flask.logging.wsgi_errors_stream',
+            'formatter': 'default'
+        }},
+        'root': {
+            'level': 'INFO',
+            'handlers': ['wsgi']
+        }
+    })
+    from src.main.app import app
     logging.info("\n".join([f'{key}={os.environ[key]}' for key in os.environ]))
-    print(app.url_map)
+    logging.info(app.url_map)
     app.run(port=os.getenv("FLASK_PORT", os.getenv("ROUTING_PORT", 5003)), host=os.getenv('ROUTER_HOST'))
 
