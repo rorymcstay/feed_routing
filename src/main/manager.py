@@ -73,7 +73,7 @@ class RoutingController(FlaskView):
             resp.mimetype = 'application/json'
             return resp
 
-    @route('clearHistory/<string:name>', methods=['DELETE'])
+    @route('clearHistory/<string:name>', methods=['DELETE', 'GET'])
     def clearHistory(self, name):
         session.clear()
         return Response('ok', status=200)
