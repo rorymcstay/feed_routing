@@ -50,7 +50,7 @@ class RoutingController(FlaskView):
         return Response('ok')
 
     def updateHistory(self, name):
-        value = str(request.data)
+        value = str(request.data, 'utf-8')
         if self._verifyItem(value, name):
             session.add(value)
             session.updatePagesProcessed()
