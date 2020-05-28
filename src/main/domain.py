@@ -8,6 +8,7 @@ class FeedHistory(dict, SessionMixin):
         self.data = kwargs.get('data', [kwargs.get('home')])
         self.increment = kwargs.get('increment')
         self.pagesProcessed = kwargs.get('pagesProcessed', 0)
+        self.userID = kwargs.get('userID', None)
 
     def updatePagesProcessed(self):
         if self.pagesProcessed is None:
@@ -62,8 +63,8 @@ class FeedHistory(dict, SessionMixin):
             return hcReq.json()
 
     def small_dict(self):
-        return dict(url=self.getLast(), increment=self.increment, pagesProcessed=self.pagesProcessed, name=self.name)
+        return dict(url=self.getLast(), increment=self.increment, pagesProcessed=self.pagesProcessed, name=self.name, userID=self.userID)
 
     def __dict__(self):
-        return dict(increment=self.increment, pagesProcessed=self.pagesProcessed, data=self.data, name=self.name)
+        return dict(increment=self.increment, pagesProcessed=self.pagesProcessed, data=self.data, name=self.name, userID=self.userID)
 
