@@ -50,18 +50,6 @@ class FeedHistory(dict, SessionMixin):
         except IndexError as ex:
             return ''
 
-    @property
-    def home_config(self):
-        fail = False
-        try:
-            hcReq = requests.get("http://{host}:{port}/parametercontroller/getParameter/router/{name}".format(**nanny_params, name=name))
-        except Exception as ex:
-            fail = True
-        if fail or hcReq.status_code == 404:
-            return dict(page={'increment': 1}, skeleton=[''], sort_first={'newest': '', 'oldest': '', 'high': '', 'low': ''})
-        else:
-            return hcReq.json()
-
     def small_dict(self):
         return dict(url=self.getLast(), increment=self.increment, pagesProcessed=self.pagesProcessed, name=self.name, userID=self.userID)
 
