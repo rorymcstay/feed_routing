@@ -1,6 +1,6 @@
 flask
 flask-classy
 requests
-feed-utils==0.7.0
+feed-utils==0.7.1
 pymongo
 

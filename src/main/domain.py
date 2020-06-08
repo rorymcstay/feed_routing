@@ -8,7 +8,7 @@ class FeedHistory(dict, SessionMixin):
         self.data = kwargs.get('data', [kwargs.get('home')])
         self.increment = kwargs.get('increment')
         self.pagesProcessed = kwargs.get('pagesProcessed', 0)
-        self.userID = kwargs.get('userID', None)
+        self.userID = str(kwargs.get('userID', None))
 
     def updatePagesProcessed(self):
         if self.pagesProcessed is None:
